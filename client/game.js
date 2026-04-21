@@ -29,7 +29,7 @@ function update() {
     playerX += dx * speed;
     playerY += dy * speed;
   }
-
+//nigga
   playerX = Math.max(0, Math.min(game.clientWidth - 30, playerX));
   playerY = Math.max(0, Math.min(game.clientHeight - 30, playerY));
 
