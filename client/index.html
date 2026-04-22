@@ -1,41 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Game</title>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    #game {
-      width: 100vw;
-      height: 100vh;
-      background: url("bg.png") no-repeat center center;
-      background-size: 1950px 1000px;
-      position: relative;
-    }
-
-    #player {
-      width: 30px;
-      height: 30px;
-      background: red;
-      position: absolute;
-      top: 200px;
-      left: 200px;
-    }
-  </style>
+  <title>IDF The Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <div id="game">
-    <div id="player"></div>
-  </div>
+  <!-- OUTER FRAME (full screen container, centers the game box) -->
+<div id="outer">
 
-  <script src="game.js"></script>
+  <!-- GAME WINDOW (fixed aspect ratio box) -->
+  <div id="game">
+
+    <!-- WORLD LAYER (everything in the game world: map, players, objects) -->
+    <div id="world">
+
+      <!-- PLAYER ENTITY (your character in the world) -->
+      <div id="player"></div>
+
+    </div>
+
+    <!-- UI LAYER (HUD, chat, menus, overlays - always on top) -->
+    <div id="ui">
+
+      <!-- CHAT UI (input box for typing messages) -->
+      <div id="chat">
+        <input id="chatInput" placeholder="Type..." />
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+ <script type="module" src="js/main.js"></script>
 
 </body>
 </html>
