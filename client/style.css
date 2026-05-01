@@ -23,7 +23,7 @@ html, body {
   position: relative;
 
   width: min(92vw, 1250px);
-  height: calc(min(92vw, 1200px) * 9 / 16);
+  height: calc(min(92vw, 1250px) * 9 / 16);
 
   background: black;
   overflow: hidden;
@@ -39,7 +39,7 @@ html, body {
   height: 100%;
 
   background: url("assets/bg.png") no-repeat center center;
-  background-size: cover; /* IMPORTANT FIX */
+  background-size: 1250px 720px; /* IMPORTANT FIX */
 }
 
 /* PLAYER */
