@@ -18,4 +18,9 @@ export function updateMovement() {
 
   state.playerX = Math.max(0, Math.min(game.clientWidth - 30, state.playerX));
   state.playerY = Math.max(0, Math.min(game.clientHeight - 30, state.playerY));
+
+  console.log(
+  "player:", state.playerX, state.playerY,
+  "target:", state.targetX, state.targetY
+);
 }

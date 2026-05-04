@@ -7,3 +7,4 @@ export const state = {
 
   speed: 5
 };
+console.log("STATE INITIALIZED");

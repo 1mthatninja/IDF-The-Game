@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { sendMove } from "./network.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   const game = document.getElementById("game");
@@ -8,5 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     state.targetX = e.clientX - rect.left;
     state.targetY = e.clientY - rect.top;
+
+    sendMove(state.targetX, state.targetY);
   });
 });
