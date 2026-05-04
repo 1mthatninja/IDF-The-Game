@@ -32,12 +32,24 @@ body {
 }
 
 .play-btn {
+  display: inline-block;          /* important for <a> */
   background: linear-gradient(#ffd84d, #ff9c00);
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
+
+  color: black;                  /* or white if you prefer */
+  text-decoration: none;         /* removes underline */
+}
+
+.play-btn:visited {
+  color: black;                  /* prevents purple visited color */
+}
+
+.play-btn:hover {
+  filter: brightness(1.1);       /* nice simple hover effect */
 }
 
 /* HERO */
