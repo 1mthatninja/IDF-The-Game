@@ -6,6 +6,11 @@ const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: 3000 });
 
+const { movePlayer } = require("./movement");
+
+const { createPlayer } = require("./players");
+
+const roomDefs = require("./roomdefs");
 
 
 // ----------------------
@@ -31,7 +36,7 @@ const world = {
 // EXIT CHECK
 // ----------------------
 function checkExit(player, roomName) {
-  const room = world[roomName];
+  const room = roomDefs[roomName];
 
   for (const exit of room.exits) {
     const inside =
@@ -40,7 +45,9 @@ function checkExit(player, roomName) {
       player.y > exit.y &&
       player.y < exit.y + exit.h;
 
-    if (inside) return exit.to;
+    if (inside) {
+      return exit.to;
+    }
   }
 
   return null;
@@ -74,13 +81,7 @@ wss.on("connection", (ws) => {
   ws.id = id;
   ws.room = "lobby";
 
-  world.lobby.players[id] = {
-    x: 200,
-    y: 200,
-    targetX: 200,
-    targetY: 200,
-    speed: 30
-  };
+  world.lobby.players[id] = createPlayer();
 
   ws.send(JSON.stringify({
     type: "init",
@@ -115,45 +116,21 @@ wss.on("connection", (ws) => {
 // WORLD UPDATE LOOP
 // ----------------------
 function updateWorld() {
-  const now = Date.now();
-  const dt = (now - lastTime) / 1000; // seconds
-  lastTime = now;
-
   for (const roomName in world) {
     const room = world[roomName];
 
     for (const id in room.players) {
       const p = room.players[id];
 
-      let dx = p.targetX - p.x;
-      let dy = p.targetY - p.y;
-
-      const dist = Math.hypot(dx, dy);
-
-      // 🧠 ARRIVAL FIX (important)
-      if (dist < 1) {
-        p.x = p.targetX;
-        p.y = p.targetY;
-        continue;
-      }
-
-      dx /= dist;
-      dy /= dist;
-
-      // ✅ SPEED IS NOW PIXELS / SECOND
-      const speed = p.speed || 200;
-
-      p.x += dx * speed * dt;
-      p.y += dy * speed * dt;
+      movePlayer(p);
 
       const newRoom = checkExit(p, roomName);
+
       if (newRoom && newRoom !== roomName) {
         const client = [...wss.clients].find(c => c.id === id);
-        if (client) movePlayerToRoom(client, id, roomName, newRoom);
-        return;
+        if (client) movePlayerTseroRoom(client, id, roomName, newRoom);
+        continue;
       }
-
-      console.log("SERVER MOVE:", id, p.x.toFixed(2), p.y.toFixed(2));
     }
   }
 }
@@ -168,6 +145,8 @@ setInterval(() => {
 
     const room = world[client.room];
     if (!room) return;
+
+    console.log("SENDING STATE", Object.keys(room.players));
 
     client.send(JSON.stringify({
       type: "state",

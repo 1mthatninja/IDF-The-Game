@@ -25,29 +25,40 @@ window.addEventListener("resize", resize);
 // RENDER
 // ----------------------
 export function render() {
-  // clear frame
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // draw static background
   if (bg.complete) {
     ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
   }
 
-  // latest server snapshot ONLY
-  const latest = snapshots[snapshots.length - 1];
+  const latest =
+    snapshots[snapshots.length - 1];
+
+  console.log("LATEST", latest);
+  console.log(canvas.width, canvas.height);
 
   if (!latest) return;
 
   const state = latest.players;
 
-  // draw players
   for (const id in state) {
     const p = state[id];
 
-    ctx.fillStyle = id === playerId ? "blue" : "red";
+    ctx.fillStyle =
+      id === playerId ? "blue" : "red";
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
+
+    ctx.arc(
+      p.x,
+      p.y,
+      15,
+      0,
+      Math.PI * 2
+    );
+
     ctx.fill();
   }
+
+  console.log("RENDERING");
 }
