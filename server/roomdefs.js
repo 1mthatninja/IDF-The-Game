@@ -1,7 +1,11 @@
-// roomDefs.js
-
 module.exports = {
+
   lobby: {
+
+    name: "lobby",
+
+    bg: "assets/bg.png",
+
     spawn: {
       x: 200,
       y: 200
@@ -13,7 +17,13 @@ module.exports = {
         y: 150,
         w: 40,
         h: 120,
-        to: "room1"
+
+        to: "room1",
+
+        spawn: {
+          x: 80,
+          y: 200
+        }
       }
     ],
 
@@ -21,6 +31,11 @@ module.exports = {
   },
 
   room1: {
+
+    name: "room1",
+
+    bg: "assets/bg.png",
+
     spawn: {
       x: 200,
       y: 200
@@ -32,7 +47,13 @@ module.exports = {
         y: 150,
         w: 40,
         h: 120,
-        to: "lobby"
+
+        to: "lobby",
+
+        spawn: {
+          x: 500,
+          y: 200
+        }
       }
     ],
 

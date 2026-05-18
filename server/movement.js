@@ -9,7 +9,7 @@ function movePlayer(p) {
 
   const moveAmount = speed * STEP;
 
-  // ✅ prevent overshoot
+  //  prevent overshoot
   if (dist <= moveAmount) {
     p.x = p.targetX;
     p.y = p.targetY;

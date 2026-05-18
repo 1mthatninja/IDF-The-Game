@@ -1,105 +1,97 @@
 console.log("SERVER FILE LOADED");
 
-const WebSocket = require("ws");
+const { movePlayer } =
+  require("./movement");
 
-const wss = new WebSocket.Server({ port: 3000 });
-
-const { movePlayer } = require("./movement");
-
-const { createPlayer } = require("./players");
-
-const { checkExit } = require("./collision");
+const { checkExit } =
+  require("./interactionSystem");
 
 const {
   world,
   movePlayerToRoom
 } = require("./rooms");
 
-
-// ----------------------
-// CONNECTION
-// ----------------------
-wss.on("connection", (ws) => {
-  const id = Math.random().toString(36).slice(2);
-
-  ws.id = id;
-  ws.room = "lobby";
-
-  world.lobby.players[id] = createPlayer();
-
-  ws.send(JSON.stringify({
-    type: "init",
-    id
-  }));
-
-  ws.on("message", (msg) => {
-    const data = JSON.parse(msg);
-
-    if (data.type === "move") {
-      const p = world[ws.room].players[ws.id];
-      if (!p) return;
-
-      p.targetX = data.x;
-      p.targetY = data.y;
-    }
-
-    if (data.type === "joinRoom") {
-      const newRoom = data.room;
-      if (!world[newRoom]) return;
-
-      movePlayerToRoom(ws, ws.id, ws.room, newRoom);
-    }
-  });
-
-  ws.on("close", () => {
-    delete world[ws.room].players[ws.id];
-  });
-});
+const {
+  wss,
+  broadcastWorldState
+} = require("./networkServer");
 
 // ----------------------
 // WORLD UPDATE LOOP
 // ----------------------
 function updateWorld() {
+
   for (const roomName in world) {
+
     const room = world[roomName];
 
     for (const id in room.players) {
-      const p = room.players[id];
 
-      movePlayer(p);
+      const player =
+        room.players[id];
 
-      const newRoom = checkExit(p, roomName);
+      // movement
+      movePlayer(player);
 
-      if (newRoom && newRoom !== roomName) {
-        const client = [...wss.clients].find(c => c.id === id);
-        if (client) movePlayerToRoom(client, id, roomName, newRoom);
-        break;
+      // exit detection
+      const exit =
+        checkExit(player, roomName);
+
+      // no exit touched
+      if (!exit) {
+        continue;
+      }
+
+      // exit target
+      const target =
+        exit.spawn;
+
+      const dx =
+        player.x - target.x;
+
+      const dy =
+        player.y - target.y;
+
+      const dist =
+        Math.sqrt(dx * dx + dy * dy);
+
+      // reached exit
+      if (dist < 5) {
+
+        const client =
+          [...wss.clients]
+            .find(c => c.id === id);
+
+        // valid room + valid socket
+        if (
+          client &&
+          world[exit.to]
+        ) {
+
+          movePlayerToRoom(
+            client,
+            id,
+            roomName,
+            exit.to,
+            exit.spawn
+          );
+        }
       }
     }
   }
 }
+
 // ----------------------
-// BROADCAST LOOP
+// MAIN LOOP
 // ----------------------
 setInterval(() => {
+
   updateWorld();
 
-  wss.clients.forEach(client => {
-    if (client.readyState !== WebSocket.OPEN) return;
-
-    const room = world[client.room];
-    if (!room) return;
-
-    console.log("SENDING STATE", Object.keys(room.players));
-
-    client.send(JSON.stringify({
-  type: "state",
-  time: Date.now(),
-  players: structuredClone(room.players)
-}));
-
-  });
+  broadcastWorldState();
 
 }, 50);
 
-console.log("Server running on ws://localhost:3000");
+console.log(
+  "Server running on ws://localhost:3000"
+);
